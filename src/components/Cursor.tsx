@@ -3,16 +3,18 @@ import "./styles/Cursor.css";
 import gsap from "gsap";
 
 const Cursor = () => {
-  const cursorRef = useRef(null);
+  const cursorRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     let hover = false;
     const cursor = cursorRef.current;
 
+    if (!cursor) return;
+
     const mousePos = { x: 0, y: 0 };
     const cursorPos = { x: 0, y: 0 };
 
-    const mouseMove = (e) => {
+    const mouseMove = (e: MouseEvent) => {
       mousePos.x = e.clientX;
       mousePos.y = e.clientY;
     };
@@ -28,21 +30,20 @@ const Cursor = () => {
         gsap.to(cursor, {
           x: cursorPos.x,
           y: cursorPos.y,
-          duration: 0.1
+          duration: 0.1,
         });
       }
+
       requestAnimationFrame(animate);
     };
 
     requestAnimationFrame(animate);
 
-    const elements = document.querySelectorAll("[data-cursor]");
+    const elements = document.querySelectorAll<HTMLElement>("[data-cursor]");
 
-    elements.forEach((item) => {
-      const element = item;
-
-      element.addEventListener("mouseover", (e) => {
-        const target = e.currentTarget;
+    elements.forEach((element) => {
+      element.addEventListener("mouseover", (e: Event) => {
+        const target = e.currentTarget as HTMLElement;
         const rect = target.getBoundingClientRect();
 
         if (element.dataset.cursor === "icons") {
@@ -51,7 +52,7 @@ const Cursor = () => {
           gsap.to(cursor, {
             x: rect.left,
             y: rect.top,
-            duration: 0.1
+            duration: 0.1,
           });
 
           cursor.style.setProperty("--cursorH", `${rect.height}px`);
