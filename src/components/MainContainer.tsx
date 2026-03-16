@@ -1,4 +1,7 @@
 import { lazy, Suspense, useEffect, useState, ReactNode } from "react";
+import gsap from "gsap";
+import { ScrollSmoother, SplitText } from "gsap/all";
+
 import About from "./About";
 import Career from "./Career";
 import Contact from "./Contact";
@@ -8,7 +11,6 @@ import Navbar from "./Navbar";
 import SocialIcons from "./SocialIcons";
 import WhatIDo from "./WhatIDo";
 import Work from "./Work";
-import setSplitText from "./utils/splitText";
 
 /* Lazy load TechStack */
 const TechStack = lazy(() => import("./TechStack"));
@@ -21,19 +23,39 @@ type MainContainerProps = {
 const MainContainer = ({ children }: MainContainerProps) => {
   const [isDesktopView, setIsDesktopView] = useState<boolean>(true);
 
+  // Initialize SplitText and ScrollSmoother
+  const setSplitTextAndSmoother = () => {
+    try {
+      // SplitText animation
+      const headings = document.querySelectorAll(".split-text");
+      headings.forEach((el) => {
+        new SplitText(el, { type: "words, chars" });
+      });
+
+      // ScrollSmoother for smooth scrolling (desktop only)
+      if (window.innerWidth > 1024 && ScrollSmoother) {
+        ScrollSmoother.create({
+          wrapper: "#smooth-wrapper",
+          content: "#smooth-content",
+          smooth: 1,
+          effects: true,
+        });
+      }
+    } catch (err) {
+      console.warn("GSAP SplitText/ScrollSmoother error:", err);
+    }
+  };
+
   useEffect(() => {
-    // Initial check
     const handleResize = () => {
-      setSplitText();
+      setSplitTextAndSmoother();
       setIsDesktopView(window.innerWidth > 1024);
     };
 
     handleResize();
     window.addEventListener("resize", handleResize);
 
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
