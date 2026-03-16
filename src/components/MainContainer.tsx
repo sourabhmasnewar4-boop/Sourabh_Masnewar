@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState, ReactNode } from "react";
 import About from "./About";
 import Career from "./Career";
 import Contact from "./Contact";
@@ -10,77 +10,75 @@ import WhatIDo from "./WhatIDo";
 import Work from "./Work";
 import setSplitText from "./utils/splitText";
 
+/* Lazy load TechStack */
 const TechStack = lazy(() => import("./TechStack"));
 
-const MainContainer = ({ children }) => {
+/* ---------- Props Type ---------- */
+type MainContainerProps = {
+  children?: ReactNode;
+};
 
-  // Detect desktop view
-  const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 1024);
+const MainContainer = ({ children }: MainContainerProps) => {
+  const [isDesktopView, setIsDesktopView] = useState<boolean>(true);
 
   useEffect(() => {
-    const resizeHandler = () => {
+    // Initial check
+    const handleResize = () => {
       setSplitText();
       setIsDesktopView(window.innerWidth > 1024);
     };
 
-    resizeHandler();
-    window.addEventListener("resize", resizeHandler);
+    handleResize();
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener("resize", resizeHandler);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
   return (
     <div className="container-main">
-
       {/* Custom Cursor */}
       <Cursor />
 
-      {/* Navbar with your name and navigation */}
+      {/* Navbar */}
       <Navbar />
 
-      {/* Social media links (GitHub, LinkedIn etc.) */}
+      {/* Social Media Links */}
       <SocialIcons />
 
-      {/* Desktop view content */}
+      {/* Desktop view children */}
       {isDesktopView && children}
 
+      {/* Smooth scrolling wrapper */}
       <div id="smooth-wrapper">
         <div id="smooth-content">
-          <div className="container-main">
+          {/* Landing section */}
+          <Landing>{!isDesktopView && children}</Landing>
 
-            {/* Landing section (Your intro) */}
-            <Landing>
-              {!isDesktopView && children}
-            </Landing>
+          {/* About You */}
+          <About />
 
-            {/* About You */}
-            <About />
+          {/* Skills / What you do */}
+          <WhatIDo />
 
-            {/* Skills / What you do */}
-            <WhatIDo />
+          {/* Career / Learning journey */}
+          <Career />
 
-            {/* Your learning journey / experience */}
-            <Career />
+          {/* Projects */}
+          <Work />
 
-            {/* Projects */}
-            <Work />
+          {/* Tech Stack (lazy loaded) */}
+          {isDesktopView && (
+            <Suspense fallback={<div>Loading Tech Stack...</div>}>
+              <TechStack />
+            </Suspense>
+          )}
 
-            {/* Tech Stack */}
-            {isDesktopView && (
-              <Suspense fallback={<div>Loading Tech Stack...</div>}>
-                <TechStack />
-              </Suspense>
-            )}
-
-            {/* Contact Section */}
-            <Contact />
-
-          </div>
+          {/* Contact Section */}
+          <Contact />
         </div>
       </div>
-
     </div>
   );
 };

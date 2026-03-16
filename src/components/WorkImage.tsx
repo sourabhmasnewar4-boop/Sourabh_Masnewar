@@ -1,10 +1,19 @@
 import { useState } from "react";
 import { MdArrowOutward } from "react-icons/md";
 
-const WorkImage = ({ image, alt, video, link }) => {
-  const [isVideo, setIsVideo] = useState(false);
-  const [videoSrc, setVideoSrc] = useState("");
+/* ---------- Props Type ---------- */
+type WorkImageProps = {
+  image: string;
+  alt?: string;
+  video?: string;
+  link?: string;
+};
 
+const WorkImage = ({ image, alt, video, link }: WorkImageProps) => {
+  const [isVideo, setIsVideo] = useState(false);
+  const [videoSrc, setVideoSrc] = useState<string>("");
+
+  /* ---------- Mouse Enter ---------- */
   const handleMouseEnter = async () => {
     if (!video) return;
 
@@ -13,17 +22,23 @@ const WorkImage = ({ image, alt, video, link }) => {
 
       // Load video from public folder
       const response = await fetch(`/videos/${video}`);
-      const blob = await response.blob();
+      if (!response.ok) throw new Error("Video not found");
 
+      const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
+
       setVideoSrc(blobUrl);
     } catch (error) {
       console.error("Video load error:", error);
     }
   };
 
+  /* ---------- Mouse Leave ---------- */
   const handleMouseLeave = () => {
     setIsVideo(false);
+
+    // Revoke old blob URL to free memory
+    if (videoSrc) URL.revokeObjectURL(videoSrc);
     setVideoSrc("");
   };
 
@@ -56,6 +71,7 @@ const WorkImage = ({ image, alt, video, link }) => {
             muted
             playsInline
             loop
+            className="work-hover-video"
           />
         )}
       </a>

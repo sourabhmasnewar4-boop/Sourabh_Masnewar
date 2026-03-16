@@ -3,9 +3,16 @@ import "./styles/Work.css";
 import WorkImage from "./WorkImage";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 
-/* -------- YOUR PROJECTS -------- */
+/* -------- TYPES -------- */
+type Project = {
+  title: string;
+  category: string;
+  tools: string;
+  image: string;
+};
 
-const projects = [
+/* -------- PROJECT DATA -------- */
+const projects: Project[] = [
   {
     title: "Developer Portfolio",
     category: "Personal Website",
@@ -39,11 +46,12 @@ const projects = [
 ];
 
 const Work = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
+  /* ---------- SLIDE NAVIGATION ---------- */
   const goToSlide = useCallback(
-    (index) => {
+    (index: number) => {
       if (isAnimating) return;
 
       setIsAnimating(true);
@@ -55,16 +63,12 @@ const Work = () => {
   );
 
   const goToPrev = useCallback(() => {
-    const newIndex =
-      currentIndex === 0 ? projects.length - 1 : currentIndex - 1;
-
+    const newIndex = currentIndex === 0 ? projects.length - 1 : currentIndex - 1;
     goToSlide(newIndex);
   }, [currentIndex, goToSlide]);
 
   const goToNext = useCallback(() => {
-    const newIndex =
-      currentIndex === projects.length - 1 ? 0 : currentIndex + 1;
-
+    const newIndex = currentIndex === projects.length - 1 ? 0 : currentIndex + 1;
     goToSlide(newIndex);
   }, [currentIndex, goToSlide]);
 
@@ -76,9 +80,7 @@ const Work = () => {
         </h2>
 
         <div className="carousel-wrapper">
-
           {/* Navigation Arrows */}
-
           <button
             className="carousel-arrow carousel-arrow-left"
             onClick={goToPrev}
@@ -96,48 +98,30 @@ const Work = () => {
           </button>
 
           {/* Slides */}
-
           <div className="carousel-track-container">
             <div
               className="carousel-track"
-              style={{
-                transform: `translateX(-${currentIndex * 100}%)`,
-              }}
+              style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
               {projects.map((project, index) => (
                 <div className="carousel-slide" key={index}>
                   <div className="carousel-content">
-
                     <div className="carousel-info">
-
                       <div className="carousel-number">
                         <h3>0{index + 1}</h3>
                       </div>
-
                       <div className="carousel-details">
                         <h4>{project.title}</h4>
-
-                        <p className="carousel-category">
-                          {project.category}
-                        </p>
-
+                        <p className="carousel-category">{project.category}</p>
                         <div className="carousel-tools">
-                          <span className="tools-label">
-                            Technologies Used
-                          </span>
+                          <span className="tools-label">Technologies Used</span>
                           <p>{project.tools}</p>
                         </div>
-
                       </div>
                     </div>
-
                     <div className="carousel-image-wrapper">
-                      <WorkImage
-                        image={project.image}
-                        alt={project.title}
-                      />
+                      <WorkImage image={project.image} alt={project.title} />
                     </div>
-
                   </div>
                 </div>
               ))}
@@ -145,22 +129,16 @@ const Work = () => {
           </div>
 
           {/* Dot Indicators */}
-
           <div className="carousel-dots">
             {projects.map((_, index) => (
               <button
                 key={index}
-                className={`carousel-dot ${
-                  index === currentIndex
-                    ? "carousel-dot-active"
-                    : ""
-                }`}
+                className={`carousel-dot ${index === currentIndex ? "carousel-dot-active" : ""}`}
                 onClick={() => goToSlide(index)}
                 data-cursor="disable"
               />
             ))}
           </div>
-
         </div>
       </div>
     </div>

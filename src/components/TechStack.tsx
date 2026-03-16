@@ -32,12 +32,19 @@ const spheres = [...Array(30)].map(() => ({
   scale: [0.7, 1, 0.8, 1, 1][Math.floor(Math.random() * 5)],
 }));
 
+/* --------- TYPES --------- */
+type SphereProps = {
+  scale: number;
+  material: THREE.MeshPhysicalMaterial;
+  isActive: boolean;
+};
+
 /* --------- SPHERE COMPONENT --------- */
-function SphereGeo({ scale, material, isActive }) {
-  const api = useRef(null);
+function SphereGeo({ scale, material, isActive }: SphereProps) {
+  const api = useRef<any>(null);
   const vec = new THREE.Vector3();
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (!isActive || !api.current) return;
 
     delta = Math.min(0.1, delta);
@@ -70,11 +77,13 @@ function SphereGeo({ scale, material, isActive }) {
       colliders={false}
     >
       <BallCollider args={[scale]} />
+
       <CylinderCollider
         rotation={[Math.PI / 2, 0, 0]}
         position={[0, 0, 1.2 * scale]}
         args={[0.15 * scale, 0.275 * scale]}
       />
+
       <mesh
         castShadow
         receiveShadow
@@ -88,8 +97,12 @@ function SphereGeo({ scale, material, isActive }) {
 }
 
 /* --------- POINTER PHYSICS --------- */
-function Pointer({ isActive }) {
-  const ref = useRef(null);
+type PointerProps = {
+  isActive: boolean;
+};
+
+function Pointer({ isActive }: PointerProps) {
+  const ref = useRef<any>(null);
   const vec = new THREE.Vector3();
 
   useFrame(({ pointer, viewport }) => {
@@ -123,7 +136,6 @@ function Pointer({ isActive }) {
 const TechStack = () => {
   const [isActive, setIsActive] = useState(false);
 
-  /* Activate animation when section visible */
   useEffect(() => {
     const handleScroll = () => {
       const section = document.getElementById("work");
@@ -139,7 +151,6 @@ const TechStack = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  /* Materials with tech logos */
   const materials = useMemo(() => {
     return textures.map(
       (texture) =>
@@ -182,7 +193,9 @@ const TechStack = () => {
             <SphereGeo
               key={i}
               {...props}
-              material={materials[Math.floor(Math.random() * materials.length)]}
+              material={
+                materials[Math.floor(Math.random() * materials.length)]
+              }
               isActive={isActive}
             />
           ))}
