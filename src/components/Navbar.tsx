@@ -1,15 +1,16 @@
 import { useEffect } from "react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import HoverLinks from "./HoverLinks";
 import { gsap } from "gsap";
-import { ScrollSmoother } from "gsap-trial/ScrollSmoother";
+import { ScrollTrigger, ScrollSmoother } from "gsap/all";
+import HoverLinks from "./HoverLinks";
 import "./styles/Navbar.css";
 
-gsap.registerPlugin(ScrollSmoother, ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
+
 export let smoother: ScrollSmoother;
 
 const Navbar = () => {
   useEffect(() => {
+    // ScrollSmoother create
     smoother = ScrollSmoother.create({
       wrapper: "#smooth-wrapper",
       content: "#smooth-content",
@@ -23,22 +24,33 @@ const Navbar = () => {
     smoother.scrollTop(0);
     smoother.paused(true);
 
-    let links = document.querySelectorAll(".header ul a");
+    // Navbar links scroll
+    const links = document.querySelectorAll(".header ul a");
     links.forEach((elem) => {
-      let element = elem as HTMLAnchorElement;
+      const element = elem as HTMLAnchorElement;
       element.addEventListener("click", (e) => {
         if (window.innerWidth > 1024) {
           e.preventDefault();
-          let elem = e.currentTarget as HTMLAnchorElement;
-          let section = elem.getAttribute("data-href");
-          smoother.scrollTo(section, true, "top top");
+          const elemTarget = e.currentTarget as HTMLAnchorElement;
+          const section = elemTarget.getAttribute("data-href");
+          if (section) smoother.scrollTo(section, true, "top top");
         }
       });
     });
-    window.addEventListener("resize", () => {
-      ScrollSmoother.refresh(true);
-    });
+
+    // Refresh ScrollSmoother on resize
+    const resizeHandler = () => ScrollSmoother.refresh(true);
+    window.addEventListener("resize", resizeHandler);
+
+    return () => {
+      window.removeEventListener("resize", resizeHandler);
+      links.forEach((elem) => {
+        const element = elem as HTMLAnchorElement;
+        element.replaceWith(element.cloneNode(true));
+      });
+    };
   }, []);
+
   return (
     <>
       <div className="header">
